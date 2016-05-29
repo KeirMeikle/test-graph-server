@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7; IE=EmulateIE9">
+    <title>Live random data</title>
+    <!--[if IE]>
+    <script type="text/javascript" src="../excanvas.js"></script>
+    <![endif]-->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dygraph/1.1.1/dygraph-combined.js"></script>
+    <script src="http://cdn.socket.io/socket.io-1.4.5.js"></script>
+  </head>
+  <body>
+    <h3 style="width:800px; text-align: center;">Live Telemetry</h3>
+    <div id="div_g" style="width:800px; height:400px;"></div>
+
+    <script type="text/javascript">
+
+      //Initial data
+      var frame = 0;
+      var data = [];
+      var x = frame;
+      var y = 0.0;
+      data.push([x, y]);
+
+      //Create socket
+      var socket = io('http://localhost:3000');
+
+      //Handle socket messages received
+      socket.on('message', function (d) {
+        console.log(d);
+        frame += 1;
+        var x = frame;
+        var y = d;
+        data.push([x, y]);
+        g.updateOptions( { 'file': data } );
+      });
+
+      //Graph creation
+      var g = new Dygraph(document.getElementById("div_g"), data,
+                          {
+                            drawPoints: true,
+                            showRoller: true,
+                            valueRange: [0.0, 1.0],
+                            labels: ['Time', 'Random']
+                          });
+    </script>
+  </body>
+</html>
